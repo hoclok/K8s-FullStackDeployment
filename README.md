@@ -2,6 +2,9 @@
 
 This project demonstrates a production-grade microservices architecture deployed on Kubernetes. The system implements modern cloud-native practices with a focus on scalability, maintainability, and operational efficiency.
 
+![Ekran görüntüsü 2025-06-07 012640](https://github.com/user-attachments/assets/f2c360a9-e15e-4481-b53a-e4c837c8520a)
+
+
 ## Kubernetes Architecture
 
 The deployment architecture is organized using Kustomize for environment-specific configurations:
