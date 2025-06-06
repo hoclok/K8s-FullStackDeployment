@@ -1,0 +1,122 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../base/configmaps/krakend-config.yaml
+  - ../../../base/configmaps/user-config.yaml
+  - ../../../base/configmaps/product-config.yaml
+  - ../../../base/configmaps/client-config.yaml
+
+namespace: production
+
+patches:
+  - target:
+      kind: ConfigMap
+      name: krakend-config
+    patch: |-
+      - op: replace
+        path: /data/krakend.json
+        value: |
+          {
+            "version": 3,
+            "name": "KrakenD Gateway - Production",
+            "port": 8080,
+            "cache_ttl": "3600s",
+            "timeout": "3s",
+            "extra_config": {
+              "security/cors": {
+                "allow_origins": ["https://app.example.com"],
+                "allow_methods": ["GET", "POST", "PUT", "DELETE"],
+                "allow_headers": ["Origin", "Authorization", "Content-Type"],
+                "expose_headers": ["Content-Length"],
+                "max_age": "12h"
+              }
+            },
+            "endpoints": [
+              {
+                "endpoint": "/api/v1/users",
+                "method": "GET",
+                "backend": [
+                  {
+                    "url_pattern": "/api/v1/users",
+                    "host": ["http://user-service:8080"],
+                    "group": "users"
+                  }
+                ]
+              },
+              {
+                "endpoint": "/api/v1/products",
+                "method": "GET",
+                "backend": [
+                  {
+                    "url_pattern": "/api/v1/products",
+                    "host": ["http://product-service:8081"],
+                    "group": "products"
+                  }
+                ]
+              },
+              {
+                "endpoint": "/api/v1/login",
+                "method": "POST",
+                "backend": [
+                  {
+                    "url_pattern": "/api/v1/login",
+                    "host": ["http://user-service:8080"]
+                  }
+                ]
+              },
+              {
+                "endpoint": "/api/v1/register",
+                "method": "POST",
+                "backend": [
+                  {
+                    "url_pattern": "/api/v1/register",
+                    "host": ["http://user-service:8080"]
+                  }
+                ]
+              }
+            ]
+          }
+  - target:
+      kind: ConfigMap
+      name: user-config
+    patch: |-
+      - op: replace
+        path: /data/config.yaml
+        value: |
+          database:
+            host: postgres
+            port: 5432
+            user: postgres
+            password: postgres
+            dbname: userdb
+            sslmode: require
+          server:
+            port: 8080
+            host: 0.0.0.0
+  - target:
+      kind: ConfigMap
+      name: product-config
+    patch: |-
+      - op: replace
+        path: /data/config.yaml
+        value: |
+          database:
+            host: postgres
+            port: 5432
+            user: postgres
+            password: postgres
+            dbname: productdb
+            sslmode: require
+          server:
+            port: 8081
+            host: 0.0.0.0
+  - target:
+      kind: ConfigMap
+      name: client-config
+    patch: |-
+      - op: replace
+        path: /data/.env.production
+        value: |
+          NEXT_PUBLIC_API_URL=https://api.example.com
+          NEXT_PUBLIC_APP_URL=https://app.example.com 

@@ -1,0 +1,79 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../base/configmaps/krakend-config.yaml
+  - ../../../base/configmaps/user-config.yaml
+  - ../../../base/configmaps/product-config.yaml
+  - ../../../base/configmaps/client-config.yaml
+
+namespace: staging
+
+patches:
+  - target:
+      kind: ConfigMap
+      name: krakend-config
+    patch: |-
+      - op: replace
+        path: /data/krakend.json
+        value: |
+          {
+            "version": 3,
+            "name": "KrakenD Gateway - Staging",
+            "port": 8080,
+            "cache_ttl": "3600s",
+            "timeout": "3s",
+            "endpoints": [
+              {
+                "endpoint": "/api/v1/users",
+                "method": "GET",
+                "backend": [
+                  {
+                    "url_pattern": "/api/v1/users",
+                    "host": ["http://user-service:8080"],
+                    "group": "users"
+                  }
+                ]
+              },
+              {
+                "endpoint": "/api/v1/products",
+                "method": "GET",
+                "backend": [
+                  {
+                    "url_pattern": "/api/v1/products",
+                    "host": ["http://product-service:8081"],
+                    "group": "products"
+                  }
+                ]
+              },
+              {
+                "endpoint": "/api/v1/login",
+                "method": "POST",
+                "backend": [
+                  {
+                    "url_pattern": "/api/v1/login",
+                    "host": ["http://user-service:8080"]
+                  }
+                ]
+              },
+              {
+                "endpoint": "/api/v1/register",
+                "method": "POST",
+                "backend": [
+                  {
+                    "url_pattern": "/api/v1/register",
+                    "host": ["http://user-service:8080"]
+                  }
+                ]
+              }
+            ]
+          }
+  - target:
+      kind: ConfigMap
+      name: client-config
+    patch: |-
+      - op: replace
+        path: /data/.env.production
+        value: |
+          NEXT_PUBLIC_API_URL=http://api.staging.local
+          NEXT_PUBLIC_APP_URL=http://app.staging.local 

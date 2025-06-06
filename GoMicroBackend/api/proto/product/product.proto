@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package product;
+
+option go_package = "./product";
+
+// ProductService provides operations for managing products
+service ProductService {
+  // CreateProduct creates a new product
+  // @Summary Create a new product
+  // @Description Creates a new product with the provided details
+  // @Tags products
+  // @Accept json
+  // @Produce json
+  // @Param product body CreateProductRequest true "Product details"
+  // @Success 200 {object} ProductResponse
+  // @Failure 400 {object} ErrorResponse
+  // @Failure 500 {object} ErrorResponse
+  // @Router /products [post]
+  rpc CreateProduct(CreateProductRequest) returns (ProductResponse) {}
+
+  // DeleteProduct deletes a product by ID
+  // @Summary Delete a product
+  // @Description Deletes a product with the specified ID
+  // @Tags products
+  // @Accept json
+  // @Produce json
+  // @Param id path int64 true "Product ID"
+  // @Success 200 {object} DeleteProductResponse
+  // @Failure 400 {object} ErrorResponse
+  // @Failure 404 {object} ErrorResponse
+  // @Failure 500 {object} ErrorResponse
+  // @Router /products/{id} [delete]
+  rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse) {}
+
+  // GetAllProducts retrieves all products
+  // @Summary Get all products
+  // @Description Retrieves a list of all products
+  // @Tags products
+  // @Accept json
+  // @Produce json
+  // @Success 200 {object} GetAllProductsResponse
+  // @Failure 500 {object} ErrorResponse
+  // @Router /products [get]
+  rpc GetAllProducts(GetAllProductsRequest) returns (GetAllProductsResponse) {}
+}
+
+// Product represents a product in the system
+message Product {
+  int64 id = 1;           // Unique identifier for the product
+  string name = 2;        // Name of the product
+  string description = 3; // Description of the product
+  double price = 4;       // Price of the product
+  int32 stock = 5;        // Available stock quantity
+  string created_at = 6;  // Creation timestamp
+  string updated_at = 7;  // Last update timestamp
+}
+
+// CreateProductRequest represents the request to create a new product
+message CreateProductRequest {
+  string name = 1;        // Name of the product
+  string description = 2; // Description of the product
+  double price = 3;       // Price of the product
+  int32 stock = 4;        // Initial stock quantity
+}
+
+// ProductResponse represents the response containing a product
+message ProductResponse {
+  Product product = 1; // The product details
+}
+
+// DeleteProductRequest represents the request to delete a product
+message DeleteProductRequest {
+  int64 id = 1; // ID of the product to delete
+}
+
+// DeleteProductResponse represents the response after deleting a product
+message DeleteProductResponse {
+  bool success = 1; // Whether the deletion was successful
+}
+
+// GetAllProductsRequest represents the request to get all products
+message GetAllProductsRequest {}
+
+// GetAllProductsResponse represents the response containing all products
+message GetAllProductsResponse {
+  repeated Product products = 1; // List of all products
+}
+
+// ErrorResponse represents an error response
+message ErrorResponse {
+  string message = 1; // Error message
+  int32 code = 2;     // Error code
+} 
