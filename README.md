@@ -127,7 +127,7 @@ The deployment architecture is organized using Kustomize for environment-specifi
 
 ## Best Practices Implementation
 
-- Infrastructure as Code (IaC)
+- Infrastructure as Code (IaC) [Terraform]
 - GitOps workflow
 - Continuous Deployment
 - Automated testing
