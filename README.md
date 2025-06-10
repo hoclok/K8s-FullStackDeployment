@@ -134,4 +134,4 @@ The deployment architecture is organized using Kustomize for environment-specifi
 - GitOps workflow
 - Continuous Deployment
 - Automated testing
-- Compliance monitoring 
+- Compliance monitoring
